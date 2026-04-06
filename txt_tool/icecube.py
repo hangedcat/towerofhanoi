@@ -169,8 +169,6 @@ def tail(file_name: str, n: int) -> list[str]:
         lines.append(line.strip())
     return list(lines)
 
-tail_5 = partial(tail, n = 5)
-
 def head(file_name: str, n: int) -> list[str]:
     return list(islice(file_line_reader(file_name), n))
     
@@ -185,6 +183,3 @@ def group_by_linecount(folder: Path | str):
         print(f"{key} lines:")
         for file in group:
             print(f"  {Path(file.file_name).name}")
-
-m = process_folder('D:/Project/Utilities/txt_tool')
-print_report(m)
