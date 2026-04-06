@@ -8,17 +8,17 @@ MISSING = TEST_DIR / "nonexistent.txt"
 
 def test_raises():
     with pytest.raises(ValueError):
-        p = icecube.FileRecord(SAMPLE)
+        p = icecube.FileReader(SAMPLE)
         p.mode = 'x'
 
 def test_valid_mode():
-    p = icecube.FileRecord(SAMPLE)
+    p = icecube.FileReader(SAMPLE)
     p.mode = 'r'
     assert p.mode == 'r'
 
 def test_validate_extension():
-    assert icecube.FileRecord.validate_extension("text.txt") == True
-    assert icecube.FileRecord.validate_extension("text.csv") == False
+    assert icecube.FileReader.validate_extension("text.txt") == True
+    assert icecube.FileReader.validate_extension("text.csv") == False
 
 def test_file_line_reader():
     lines = list(line for line in icecube.file_line_reader(SAMPLE))
@@ -35,3 +35,7 @@ def test_filereader_cm():
 def test_filereader_cm2():
     with icecube.FileReader(MISSING) as f:
         assert f is None
+
+def test_filerecord_is_abstract():
+    with pytest.raises(TypeError):
+        icecube.FileRecord(SAMPLE)

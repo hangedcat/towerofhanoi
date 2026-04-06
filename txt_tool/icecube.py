@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import datetime
+from abc import ABC, abstractmethod
 from enum import Enum
 from functools import wraps, partial, lru_cache
 from dataclasses import dataclass, field
@@ -18,7 +19,11 @@ class FileMode(Enum):
     WRITE = 'w'
     APPEND = 'a'
 
-class FileRecord:
+class FileRecord(ABC):
+
+    @abstractmethod
+    def process(self) -> None:
+        ...
 
     def __init__(self, file_name: Union[str, Path], mode: str = "r"):
         self.file_name = Path(file_name)
@@ -53,6 +58,9 @@ class FileRecord:
 
 class FileReader(FileRecord):
 
+    def process(self) -> None:
+        self.line_reader()
+
     def __init__(self, file_name: Union[str, Path]):
         super().__init__(file_name, mode= FileMode.READ.value)
 
@@ -78,6 +86,9 @@ class FileReader(FileRecord):
 
 class FileWriter(FileRecord):
 
+    def process(self):
+        self.line_count = sum([1 for line in file_line_reader(self.file_name)])
+
     def __init__(self, file_name: str):
         super().__init__(file_name, mode= FileMode.WRITE.value)
 
@@ -90,6 +101,9 @@ class FileWriter(FileRecord):
             logger.error(f"Permission Denied: {self.file_name}")
 
 class FileAppender(FileRecord):
+    
+    def process(self):
+        self.line_count = sum([1 for line in file_line_reader(self.file_name)])
 
     def __init__(self, file_name: str):
         super().__init__(file_name, mode= FileMode.APPEND.value)
@@ -183,3 +197,5 @@ def group_by_linecount(folder: Path | str):
         print(f"{key} lines:")
         for file in group:
             print(f"  {Path(file.file_name).name}")
+
+w = FileWriter('text.txt')
